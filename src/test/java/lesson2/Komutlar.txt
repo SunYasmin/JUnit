@@ -1,0 +1,139 @@
+.isEnabled-> erişilebilir olma (edited)
+
+.isDisplayed-> görünür olma
+
+.isSelected-> seçilir olma
+
+assertTrue-> pozitif test case ( içerdiği, logonun görüntülendiği vb)
+
+assertFalse-> negatif test case ( içermediği, erişilemediği vb)
+
+assertEquals-> eşit olduğu( actual title'ın expected title'a eşit olduğu, result yazısının actual texte eşit olduğu)
+
+
+
+WINDOW HANDLE
+
+/*
+    - Bazen bir butona tıkladığımızda, başka bir sekmede(tab) yeni bir pencere
+      veya bağımsız yeni bir pencere açılır.
+
+    - Birden fazla pencereyle calişirken driver’a pencereler arasında
+      gecis yaptirmamiz gerekir.
+
+    - Pencereler arasında gecis yapmak icin window handle degerini kullaniriz.
+
+    - window handle : Selenium WebDriver’in, WebDriver objesi başlatıldığında
+      her pencereye verdigi unique alfanumerik kimlik degeridir.
+
+    - driver.getWindowHandle() method'unu uyguladığımızda, bu method bize
+      içinde bulunduğumuz sayfanın unique hash code'unu döndürür.
+      Selenium sayfalar arası geçişte bu window handle değerini kullanır.
+      Eğer sayfalar arasında driver'ımızı gezdiriyorsak ve herhangi bir sayfadan
+      içinde bulunduğumuz sayfaya geri dönmek istiyorsak şu method'u kullanırız:
+      driver.switchTo.window(eski sayfamızın hash code'u)
+
+    - Alerts ve iFrame konularında olduğu gibi
+      WindowHandle konusunda da temel method SWITCH TO() METHOD'UDUR.
+
+      Window Handle konusu ile ilgili method'lar:
+            1) İçinde olduğumuz sayfanın window handle değerini alabilmek için
+               ===> driver.getWindowHandle();
+            2) Pencereler arasında geçiş yapabilmek için
+               ===> driver.switchTo().window(Gitmek istediğimiz sayfanın Handle Degeri);
+            3) Yeni tab oluşturup geçiş yapabilmek için
+               ===> driver.switchTo().newWindow(WindowType.TAB);
+            4) Yeni window olusturup geçiş yapabilmek için
+               ===> driver.switchTo().newWindow(WindowType.WINDOW);
+
+     - ÖNEMLİ NOT: Handle Windows ile windowHandle kelimelerini karıştırmamak gerek.
+       Handle kelime anlamı olarak üstesinden gelmek demek.
+
+       Handle Windows konusu, açılan pencelerin/tabların
+       üstesinden gelmek anlamında kullanılıyor.
+       Aynı Handle Alerts, Handle Iframe konularında olduğu gibi.
+
+       Bunun yanında windowHandle ise, sayfanın handle değerini almak için kullandığımız
+       getWindowHandle() method'unun içinde geçiyor. Bu method ile o sayfanın
+       hash code'unu alıyoruz ve yukarıda yer alan method'lar yardımıyla
+       sayfalar arasında geçiş yapabiliyoruz (yani Window'ları Handle edebiliyoruz).
+
+     - 3 ve 4 numaralı maddelerde belirtilen method'ları uygulayarak
+       yeni bir boş tab'a/window'a geçtiğimizde driver bir önceki sayfadan
+       hiçbir şey getirmez, yeni tab boş olur (about.blank yazar url kısmında).
+       Dolayısıyla, yeni tab'da/window'da önceki sayfadan devam eden bir görev varsa
+       (örneğin sağ click yaparak yeni tab'a/window'a geçmiş isek),
+       geçiş yapılan ana kadar yaptığımız tüm adımları
+       yeni tab'da/window'da tekrar etmemiz gerekir.
+
+     */
+    /*
+    WINDOW HANDLES:
+
+           switchTo().newWindow() method'unu uygulamaksızın, bulunduğumuz sayfada bir linke
+           tıklayarak yeni bir tab'a/window'a geçtiğimizde biz driver'a yeni sayfaya geç demedikçe
+           driver eski sayfada kalır ve yeni sayfa ile ilgili hiçbir işlem yapamaz.
+
+           Yeni sayfada driver'ı çalıştırmak istersek, önce driver'ı yeni sayfaya yollamalıyız.
+           Bunun için açılan yeni sayfanın windowhandle değerine ihtiyacımız var, çünkü
+           driver.switchTo().window(Gitmek istediğimiz sayfanın Handle Degeri) method'unu
+           uygulayabilmek için yeni tab'ın/window'un handle değeri lazım, ancak bunu bilmiyoruz.
+
+           Eğer kontrolsüz açılan bir tab veya window varsa o zaman sayfaların
+           window handle değerlerini elde etmem gerekir.
+
+           Bu amaçla ilgili iki yöntemimiz var:
+
+       BİRİNCİ YÖNTEM (Kısa Yol):
+
+           String'lerden oluşan bir list oluşturup getWindowHandles() method'u ile
+           açık bulunan tüm tab'ların / window'ların WindowHandle değerlerini o list'e atıyoruz.
+           Daha sonra driver.switchTo().window() method'unun içine oluşturduğumuz list'ten
+           hangi web sayfasını istiyorsak onun indeksini yazarak sayfalar arasında geçiş yapabiliyoruz.
+
+           Yapı şu şekilde:
+           List<String> windowList = new ArrayList<String>(driver.getWindowHandles());
+           driver.switchTo().window(windowList.get(driver'ı götürmek istediğimiz window'un indeks numarası))
+
+           Örnek:
+           driver.switchTo().window(windowList.get(1));
+           Örneğimizde windowList adındaki list'imizden 1. elementi getirdik.
+           0 ilk sayfanın WindowHandle değerini, 1 ise ikinci sayfanın WindowHandle değerini verir.
+
+
+        İKİNCİ YÖNTEM:
+
+        1) Öncelikle ikinci sayfa açılmadan önce ilk sayfanın window handle değerini
+           bir String'e atayalım:
+
+          String ilkSayfaninHandleDegeri = driver.getWindowHandle();
+
+        2) Sonra açık tüm sayfaların window handle değerlerini almamız gerekecek.
+           Bunun için driver.getWindowHandles() method'unu kullanıyoruz.
+           Bu method bize String'lerden oluşan bir SET döndürüyor:
+
+           Set<String> windowHandleSeti = driver.getWindowHandles();
+
+        3) Bu set'in içinde açık olan iki sayfanın da window handle değeri var.
+           İlk sayfanın window handle değerini daha önce almıştık. Dolayısıyla karşılaştırma
+           yaptığımızda, set'in içindeki iki farklı window handle değerinden
+           ilk sayfanın window handle değerine eşit olan işimize yaramaz
+           farklı olan window handle değeri ise ikinci tab'ın/window'un
+           window handle değerini verecektir.
+
+           Oluşturduğumuz set içinden ihtiyacımız olan ikinci tab'ın/window'un
+           window handle değerini çekebilmek için forEach method'unu kullanırız.
+
+           String ikinciSayfaninWindowHandleDegeri="";
+           for (String each: windowHandleSeti)
+                    {
+                       if (!each.equals(ilkSayfaninHandleDegeri)){
+                              ikinciSayfaninWindowHandleDegeri = each;
+                     }
+              }
+
+           Böylece ikinci sayfanın window handle değerini elde etmiş olduk.
+           Bundan sonra sayfalar arasında window handle değerleri ile
+           istediğimiz gibi geçiş yapabiliriz.
+
+*/
