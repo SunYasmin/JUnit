@@ -6,6 +6,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
+import org.openqa.selenium.chrome.ChromeOptions;
 
 import java.time.Duration;
 
@@ -29,7 +30,12 @@ public class C02_BeforeAfter {
     public void setUp(){
         WebDriverManager.chromedriver().setup();
         //WebDriver driver = new ChromeDriver(); after i da kullanacagim icin hata veriyor o yuzden class level de tanimlarim
-        driver = new ChromeDriver();  // WebDriver driver = .....diye yazinca hata veriyor
+        ChromeOptions options = new ChromeOptions();
+        options.addArguments("--remote-allow-origins=*");
+        ChromeDriver driver = new ChromeDriver(options);
+
+
+        //driver = new ChromeDriver();  // WebDriver driver = .....diye yazinca hata veriyor
         driver.manage().window().maximize();
         driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
 
